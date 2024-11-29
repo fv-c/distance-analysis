@@ -15,7 +15,7 @@ import numpy as np
 # -------------------------------------------------------------
 
 class Event:
-    def __init__(self, dict):
+    def __init__(self, dict: dict):
         self.dict = dict
 
 # -------------------------------------------------------------
@@ -23,28 +23,37 @@ class Event:
 # -------------------------------------------------------------
 
 class Note(Event):
-    def __init__(self, dict):
+    def __init__(self, dict: dict):
         super().__init__(dict)
         self.onset = dict['onset']
         self.duration = dict['duration']
 
     def __str__(self) -> str:
-        return f'onset: {self.onset}, duration: {self.duration}'
+        return f'Note object. Dict: {self.dict}'
 
 # -------------------------------------------------------------
 # Figure class
 # -------------------------------------------------------------
 
+type noteList = list[Note]
+
 class Figure():
-    def __init__(self, noteList):
+    def __init__(self, noteList: noteList):
 
         if not isinstance(noteList, list):
             raise TypeError("Expected a list of Notes.")
         if not all(isinstance(obj, Note) for obj in noteList):
             raise TypeError("Expected a list of Notes.")
         
-        self.noteList = noteList
+        #self.noteList = noteList
 
+        self.noteList = []
+        for note in noteList:
+            if "pitch" not in note.dict:
+                note.dict["pitch"] = -1
+            self.noteList.append(note)
+
+        # vvv questo è sbagliato vvv
         self.figureParams = list(self.noteList[0].dict.keys())
 
     def getFigureParamsDict(self) -> dict:
@@ -62,7 +71,7 @@ class Figure():
 
         return d
     
-    def getParamFFTAnalysis(self, paramName) -> list:
+    def getParamFFTAnalysis(self, paramName: str) -> list:
     
         paramFFT = np.fft.fft(self.getFigureParamsDict()[paramName])
 
@@ -72,8 +81,10 @@ class Figure():
 # Comparator class
 # -------------------------------------------------------------
 
+type figureList = list[Figure]
+
 class Comparator:
-    def __init__(self, figureList):
+    def __init__(self, figureList: figureList):
 
         self.figureList = figureList
 
@@ -82,3 +93,6 @@ class Comparator:
         for figure in self.figureList:
             lengths.append(len(figure.noteList))
         return max(lengths)
+    
+    def compareParamFFTAnalysis(self, param: str):
+        pass
